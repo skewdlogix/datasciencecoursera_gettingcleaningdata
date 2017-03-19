@@ -199,6 +199,6 @@ head(tidy_data,n=15)
 # write tidy_data to .txt file
 write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt")
 
-# read tidy_data.txt
+# read HumanActivityRecognitionUsingSmartphones.txt
 final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
 view(final_tidy_data)
