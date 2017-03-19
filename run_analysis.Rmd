@@ -1,0 +1,322 @@
+---
+title: "run_analysis"
+author: "skewdlogix"
+date: "March 18, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Getting and Cleaning Data Course Project
+
+### Introduction
+
+The purpose of this project is to demonstrate the ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis.  The required submissions are: 1) a tidy data set as described below, 2) a link to a Github repository with a script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that were performed to clean up the data called CodeBook.md. In addition, a README.md should also be included in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.
+
+The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained:
+
+http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+
+Here are the data for the project:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+
+There also is an R script called run_analysis.R that does the following.
+
+   1) Merges the training and the test sets to create one data set.
+   2) Extracts only the measurements on the mean and standard deviation for each measurement.
+   3) Uses descriptive activity names to name the activities in the data set
+   4) Appropriately labels the data set with descriptive variable names.
+   5) From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+   
+### Initial Workspace Preparation
+
+Remove any old files and clean up workspace
+```{r}
+rm(list=ls(all=TRUE))
+```
+
+Call appropriate libraries for functions
+
+```{r message=F, warning=F}
+library(data.table)
+library(dplyr)
+```
+
+Create working directory if it does not already exist
+
+```{r}
+if (!getwd() == "D:/R_workplace/DataScienceSpecialization/getting_and_cleaning_data/data")
+   { dir.create("D:/R_workplace/DataScienceSpecialization/getting_and_cleaning_data/data")
+}
+```
+
+Set working directory and assign it to wd
+
+```{r}
+setwd("D:/R_workplace/DataScienceSpecialization/getting_and_cleaning_data/data")
+wd <- getwd()
+```
+
+### Download Data Files and Unzip Files to be Analyzed
+
+Assign dataset zipfile to a  
+Assign url for file location to fileUrl  
+Download file using assigned parameters
+
+```{r}
+a <- "Dataset.zip"
+fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+download.file(fileUrl, file.path(wd, a))
+```
+
+Extract list of all files in the zip file and assign to p  
+View files in zip archive
+
+```{r}
+p <- unzip(file.path(wd, a), list=TRUE)
+p
+```
+
+Remove any files with "Inertial"" in name as they are not part of the data analysis  
+View file names of files to be extracted
+
+```{r}
+p <- p[grep("Inertial", p$Name, invert=TRUE),1]
+p
+```
+
+Unzip only files that are necessary for the data analysis project  
+Collapse folder structure so that all files are in working directory
+
+```{r}
+unzip(file.path(wd, a),files= p, junkpaths=TRUE)
+```
+
+Once files are unzipped then view README.txt in order to understand construction of data files and how they can be combined into a dataset to be analyzed
+
+### Read Data Files into Workspace and Examine Characteristics
+
+Read test and train .txt data files into data tables in working directory  
+Examine size of data tables to get first indication of their dimensions
+
+```{r}
+test_data  <- fread(file.path(wd, "X_test.txt"))
+train_data  <- fread(file.path(wd, "X_train.txt"))
+dim(test_data)
+dim(train_data)
+```
+
+Examine names of columns in test and train files to determine if they are similar
+
+```{r}
+names(test_data) == names(train_data)
+```
+
+Read test and train activity label .txt files into data tables in working directory  
+Examine structure of test and train activity label data tables  
+Determine count of label activities that exist in both test and train label data tables
+
+```{r}
+test_label <- fread(file.path(wd, "y_test.txt"))
+train_label <- fread(file.path(wd, "y_train.txt"))
+str(test_label)
+str(train_label)
+table(test_label)
+table(train_label)
+```
+
+Read features .txt file into data table so column names can be attached to test and train data tables and examine
+
+```{r}
+features <- fread(file.path(wd, "features.txt"))
+head(features)
+```
+
+Read activity labels .txt files into data table and then examine so we know what types of activities are being evaluated 
+
+```{r}
+activities <- fread(file.path(wd, "activity_labels.txt"))
+head(activities)
+```
+
+Examine structure of features and activities data tables
+
+```{r}
+str(features)
+str(activities)
+```
+
+Read subject test and train .txt files into data tables so they can be used to specify which subjects performed which activity and the respective captured data  
+Examine the structure of the test and train subject data tables
+
+```{r}
+subject_test <- fread(file.path(wd, "subject_test.txt"))
+subject_train <- fread(file.path(wd, "subject_train.txt"))
+str(subject_test)
+str(subject_train)
+```
+
+
+### Merge Data Sets
+
+Now that all data sets have been examined and the README and features_info text files have been read, it is time to begin to merge the data sets as per the instructions  
+Use rbind to row bind the respective train and test data sets for the main data, the activity label data, and the subject data  
+Examine the dimensions of the combined main data set, the combined activity label data set, and the combined subject data set
+
+```{r}
+data_all <- rbind(train_data, test_data)
+label_all <- rbind(train_label, test_label)
+subject_all <- rbind(subject_train, subject_test)
+dim(data_all)
+dim(label_all)
+dim(subject_all)
+```
+
+### Extract Measurements for Mean and Standard Deviation Only
+
+Now extract only measurements on the mean and standard deviation for each measurement  
+
+Step 1 is to determine which columns have mean [mean()] and standard deviation [std()] in them  
+Only variables with the mean or standard deviation of the entire variable are examined (this results in only including variables which have mean() or std() at the end of the variable name)
+
+```{r}
+data_col <- features[grep("mean\\(\\)|std\\(\\)", V2)]
+```
+
+Step 2 is to extract the first column from the resulting data table and append "v" to the front of each variable in order to create a link variable so that we can map the extracted features to the main data column names
+
+```{r}
+coll <- data_col[[1]]
+coll <- paste0("V", coll)
+head(coll)
+```
+
+Step 3 is to use the resultant link vector for the extracted features with mean and standard deviation measurements to subset the main data table into the columns that are required for the analysis
+
+```{r}
+data_all <- data_all[,coll, with= FALSE]
+```
+
+Check that the vector of link variables matches the column names of the extracted main data set to ensure that the relative ordering of the variables is the same
+
+```{r}
+names(data_all) == coll
+```
+
+
+### Appropriately Label the Data Set with Descriptive Variable Names
+
+Next replace the variable names in the columns with the more decriptive feature labels also replace the column names in label_all, activities, and subject_all data tables so that when they are combined they will have the correct column names
+
+```{r}
+setnames(data_all, names(data_all), data_col$V2)
+setnames(label_all, "V1", "Link")
+setnames(activities, "V1", "Link")
+setnames(activities, "V2", "Activities")
+setnames(subject_all, "V1", "Subject")
+```
+
+Combine the subject data table with the activity label data table and the extracted main data data table
+
+```{r}
+data_all <- cbind(subject_all, label_all, data_all)
+```
+
+At this point the column names are still fairly cryptic and since we desire easily understandable names, we replace the abbreviations with the actual word in the data table columns - this results in descriptive column names for the respective measurements that can be easily read and understood
+
+```{r}
+names(data_all) <- gsub("^t", "time_", names(data_all))
+names(data_all) <- gsub("^f", "frequency_", names(data_all))
+names(data_all) <- gsub("Acc", "_Acceleration", names(data_all))
+names(data_all) <- gsub("Gyro", "_Gyroscope", names(data_all))
+names(data_all) <- gsub("Jerk", "_Jerk", names(data_all))
+names(data_all) <- gsub("Mag", "_Magnitude", names(data_all))
+names(data_all) <- gsub("BodyBody", "Body_Body", names(data_all))
+```
+
+
+### Use Descriptive Activity Names to Name the Activities in the Data Set
+
+Next merge the main data table with the activities data table so the activities in the main data table have desctiptive names and are readily understandable  
+Remove the "Link" variable that was used to merge the data tables
+
+```{r}
+data_all <- merge(data_all, activities, "Link")
+data_all$Link <- NULL
+```
+
+Set column order so that Subject is in the first column and Activites are in the second column and the additional columns follow in their respective order
+
+```{r}
+setcolorder(data_all, c("Subject", "Activities", colnames(data_all)[!(colnames(data_all) 
+    %in% c("Subject", "Activities"))]))
+```
+
+
+### Create Tidy Data Set from the Aggregated Data Table
+
+Designate the columns for Subject and Activities are factors to facilitate additional analysis
+
+```{r}
+data_all$Subject <- factor(data_all$Subject)
+data_all$Activities <- factor(data_all$Activities)
+```
+
+Create vector of all measurement variables to facilitate the translation from a wide data table to a narrow data table with all measurements in one column using melt in the next data step  
+Create a narrow data table with the types of measurement for each Subject and Activities combination in one column and the resulting value of the measurements in another column  
+This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable
+
+```{r}
+mysubset <- colnames(data_all)[!(colnames(data_all) 
+                                  %in% c("Subject", "Activities"))]
+data_all_narrow <- melt(data_all, c("Subject", "Activities"), mysubset, variable.name= 
+    "Measurement")
+```
+
+### Creates a Second, Independent Tidy Data Set with the Average of Each Variable for Each Activity and Each Subject
+
+Complete the second, independent tidy data set in the data table by grouping the data by each subject and each activity and calculating the respective average for each grouped variable. This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable.  
+The principles of tidy data are:  
+   1. Each variable forms a column.  
+   2. Each observation forms a row.  
+   3. Each type of observational unit forms a table.  
+See Wickham, Hadley, "Tidy Data", Journal of Statistical Software, MMMMMM YYYY, Volume VV, Issue II. http://www.jstatsoft.org/
+
+```{r}
+tidy_data <- data_all_narrow %>% group_by(Subject, Activities, Measurement) %>% 
+    summarize(Average= mean(value))
+```
+
+Examine resulting tidy data set
+
+```{r}
+head(tidy_data,n=15)
+```
+
+Write tidy_data to .txt file
+
+```{r}
+write.table(tidy_data, "tidy_data.txt")
+```
+
+read tidy_data.txt
+
+```{r}
+final_tidy_data <- read.table("tidy_data.txt", header= TRUE)
+view(final_tidy_data)
+```
+
+
+
+
+
+
+
+
+
+
+
+
