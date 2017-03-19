@@ -197,8 +197,8 @@ tidy_data <- data_all_narrow %>% group_by(Subject, Activities, Measurement) %>%
 head(tidy_data,n=15)
 
 # write tidy_data to .txt file
-write.table(tidy_data, "tidy_data.txt")
+write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt")
 
 # read tidy_data.txt
-final_tidy_data <- read.table("tidy_data.txt", header= TRUE)
+final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
 view(final_tidy_data)
