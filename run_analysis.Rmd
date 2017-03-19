@@ -302,7 +302,7 @@ Write tidy_data to .txt file
 write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt")
 ```
 
-read tidy_data.txt
+read HumanActivityRecognitionUsingSmartphones.txt
 
 ```{r}
 final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
