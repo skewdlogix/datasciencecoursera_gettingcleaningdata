@@ -235,7 +235,7 @@ p</code></pre>
 ## 30 2012-11-29 15:09:00
 ## 31 2012-11-29 15:25:00
 ## 32 2012-11-29 15:09:00</code></pre>
-<p>Remove any files with Inertial in name as they are not part of the data analysis<br />
+<p>Remove any files with “Inertial”&quot; in name as they are not part of the data analysis<br />
 View file names of files to be extracted</p>
 <pre class="r"><code>p &lt;- p[grep(&quot;Inertial&quot;, p$Name, invert=TRUE),1]
 p</code></pre>
@@ -431,11 +431,11 @@ names(data_all) &lt;- gsub(&quot;BodyBody&quot;, &quot;Body_Body&quot;, names(da
 </div>
 <div id="use-descriptive-activity-names-to-name-the-activities-in-the-data-set" class="section level3">
 <h3>Use Descriptive Activity Names to Name the Activities in the Data Set</h3>
-<p>Next merge the main data table with the activities data table do the activities in the main data table have desctiptive names and are readily understandable<br />
+<p>Next merge the main data table with the activities data table so the activities in the main data table have desctiptive names and are readily understandable<br />
 Remove the “Link” variable that was used to merge the data tables</p>
 <pre class="r"><code>data_all &lt;- merge(data_all, activities, &quot;Link&quot;)
 data_all$Link &lt;- NULL</code></pre>
-<p>Set column order so that SUbject is in the first column and Activites are in the second column and the additional columns follow in their respective order</p>
+<p>Set column order so that Subject is in the first column and Activites are in the second column and the additional columns follow in their respective order</p>
 <pre class="r"><code>setcolorder(data_all, c(&quot;Subject&quot;, &quot;Activities&quot;, colnames(data_all)[!(colnames(data_all) 
     %in% c(&quot;Subject&quot;, &quot;Activities&quot;))]))</code></pre>
 </div>
@@ -445,15 +445,16 @@ data_all$Link &lt;- NULL</code></pre>
 <pre class="r"><code>data_all$Subject &lt;- factor(data_all$Subject)
 data_all$Activities &lt;- factor(data_all$Activities)</code></pre>
 <p>Create vector of all measurement variables to facilitate the translation from a wide data table to a narrow data table with all measurements in one column using melt in the next data step<br />
-Create a narrow data table with the types of measurement for each Subject and Activities combination in one column and the resulting value of the measurements in another column this is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable</p>
+Create a narrow data table with the types of measurement for each Subject and Activities combination in one column and the resulting value of the measurements in another column<br />
+This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable</p>
 <pre class="r"><code>mysubset &lt;- colnames(data_all)[!(colnames(data_all) 
                                   %in% c(&quot;Subject&quot;, &quot;Activities&quot;))]
 data_all_narrow &lt;- melt(data_all, c(&quot;Subject&quot;, &quot;Activities&quot;), mysubset, variable.name= 
     &quot;Measurement&quot;)</code></pre>
 </div>
-<div id="creates-a-second-independent-tidy-data-set-with-the-average-of-each-variable-for-each-activity-and-each-subject." class="section level3">
-<h3>Creates a Second, Independent Tidy Data Set with the Average of Each Variable for Each Activity and Each Subject.</h3>
-<p>Complete the second independent tidy data set in the data table by grouping the data by each Subject and each activity and calculating the respective average for each grouped variable. This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable.<br />
+<div id="creates-a-second-independent-tidy-data-set-with-the-average-of-each-variable-for-each-activity-and-each-subject" class="section level3">
+<h3>Creates a Second, Independent Tidy Data Set with the Average of Each Variable for Each Activity and Each Subject</h3>
+<p>Complete the second, independent tidy data set in the data table by grouping the data by each subject and each activity and calculating the respective average for each grouped variable. This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable.<br />
 The principles of tidy data are:<br />
 1. Each variable forms a column.<br />
 2. Each observation forms a row.<br />
@@ -484,9 +485,10 @@ See Wickham, Hadley, “Tidy Data”, Journal of Statistical Software, MMMMMM YY
 ## 14       1     LAYING time_Body_Acceleration_Jerk-mean()-Y  0.003838204
 ## 15       1     LAYING time_Body_Acceleration_Jerk-mean()-Z  0.010834236</code></pre>
 <p>Write tidy_data to .txt file</p>
-<pre class="r"><code>write.table(tidy_data, &quot;tidy_data.txt&quot;)</code></pre>
-<p>read tidy_data.txt</p>
-<p>final_tidy_data &lt;- read.table(“tidy_data.txt”, header= TRUE) view(final_tidy_data)</p>
+<pre class="r"><code>write.table(tidy_data, &quot;HumanActivityRecognitionUsingSmartphones.txt&quot;)</code></pre>
+<p>read HumanActivityRecognitionUsingSmartphones.txt</p>
+<pre class="r"><code>final_tidy_data &lt;- read.table(&quot;HumanActivityRecognitionUsingSmartphones.txt&quot;, header= TRUE)
+View(final_tidy_data)</code></pre>
 </div>
 </div>
 
