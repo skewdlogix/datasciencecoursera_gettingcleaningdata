@@ -1,0 +1,64 @@
+---
+title: "Codebook"
+author: "skewdlogix"
+date: "March 20, 2017"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(data.table)
+setwd("D:/R_workplace/DataScienceSpecialization/getting_and_cleaning_data/data")
+```
+
+## List of Variables
+
+The final tidy data set is created in the long form and has the folowing variables:
+
+```{r}
+final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
+names(final_tidy_data)
+```
+
+## Composition of Each Variable with Description
+
+Subject --  Each observation identifies the subject who performed the activity for each window sample. The number of subjects range from 1 to 30. This variable is a factor.
+
+```{r}
+unique(final_tidy_data[,1])
+```
+
+Activities  --  Each subject performed six activities (WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING) wearing a smartphone (Samsung Galaxy S II) on the waist. This variable is a factor.
+
+```{r}
+unique(final_tidy_data[,2])
+```
+
+Measurement --  Each Measurement observation identifies either the mean and standard deviation of a combination of features which include the time and frequency of triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration as well as triaxial angular velocity from the gyroscope. The acceleration signal was separated into body and gravity acceleration signals and the body linear acceleration and angular velocity were derived in time to obtain Jerk signals. Also the magnitude of these three-dimensional signals were calculated using the Euclidean norm. These X, Y, Z hyphenated compounds to some of the observations indicate/denote 3-axial signals in the X, Y and Z directions. A decision was made to not try and break the component factors out since this would have merely increased the number of fields with no gain in explanatory power. In addition, doing so would have generated many NA entries. This variable is a factor.
+
+```{r}
+unique(final_tidy_data[,3])
+```
+
+Average -- This variable contains the averages of the mean and standard deviation for each measurement type calculated across all unique combinations of subjects and activities. This variable is a calculated average measurement observation which is unique to each combination of factors.
+
+## Structure of the Tidy Dataset
+
+```{r}
+str(final_tidy_data)
+dim(final_tidy_data)
+```
+
+## Summary of the Tidy Dataset
+
+```{r}
+summary(final_tidy_data)
+```
+
+## The Tidy Dataset (the first 30 rows)
+
+```{r }
+head(final_tidy_data, n= 30)
+```
+

@@ -40,9 +40,11 @@ rm(list=ls(all=TRUE))
 
 Call appropriate libraries for functions
 
-```{r message=F, warning=F}
+```{r}
 library(data.table)
 library(dplyr)
+library(knitr)
+library(markdown)
 ```
 
 Create working directory if it does not already exist
@@ -306,10 +308,15 @@ read HumanActivityRecognitionUsingSmartphones.txt
 
 ```{r}
 final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
-view(final_tidy_data)
+View(final_tidy_data)
 ```
 
+Create Codebook.md
 
+```{r}
+knit("Codebook.Rmd", encoding="ISO8859-1")
+markdownToHTML("Codebook.md", "Codebook.html")
+```
 
 
 
