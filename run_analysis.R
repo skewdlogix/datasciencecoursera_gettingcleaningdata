@@ -4,6 +4,8 @@ rm(list=ls(all=TRUE))
 # call appropriate libraries for functions
 library(data.table)
 library(dplyr)
+library(knitr)
+library(markdown)
 
 # create working directory if it does not already exist
 if (!getwd() == "D:/R_workplace/DataScienceSpecialization/getting_and_cleaning_data/data")
@@ -199,6 +201,11 @@ head(tidy_data,n=15)
 # write tidy_data to .txt file
 write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt")
 
-# read HumanActivityRecognitionUsingSmartphones.txt
+# read tidy_data.txt
 final_tidy_data <- read.table("HumanActivityRecognitionUsingSmartphones.txt", header= TRUE)
 view(final_tidy_data)
+
+# Create run_analysis.md
+
+knit("run_analysis.Rmd", encoding="ISO8859-1")
+markdownToHTML("run_analysis.md", "run_analysis.html")
