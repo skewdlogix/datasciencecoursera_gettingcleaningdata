@@ -42,3 +42,5 @@ Once the working directories have been adjusted then the R script - run_analysis
  
  The final tidy data file is in the long form of a narrow data table with Subject and Activities in the first two columns and the types of measurement for each Subject and Activities combination in the next column and the resulting value of the measurements in the final column.   
 This is the long form of tidy data as mentioned in the rubric as either long or wide form is acceptable.
+
+Both the - run_analysis.R and run_analysis.Rmd - files explain the step-by-step process whereby the data files are accessed and then manipulated to modify them into the final tidy data format.
