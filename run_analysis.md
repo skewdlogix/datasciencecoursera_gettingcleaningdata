@@ -606,7 +606,7 @@ Write tidy_data to .txt file
 
 
 ```r
-write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt")
+write.table(tidy_data, "HumanActivityRecognitionUsingSmartphones.txt", row.names= FALSE)
 ```
 
 read HumanActivityRecognitionUsingSmartphones.txt
